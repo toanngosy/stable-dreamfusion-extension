@@ -1,4 +1,4 @@
-function start_training_dreambooth(){
+function start_training_dreamfusion(){
     requestProgress('df');
     gradioApp().querySelector('#df_error').innerHTML='';
     gradioApp().querySelector('#df_status').innerHTML='';
@@ -17,4 +17,7 @@ new_titles = {
 	"Train": "Start training.",
 	"Cancel": "Cancel training."
 }
+
+ex_titles = Object.assign({}, ex_titles, new_titles);
+titles = ex_titles;
 

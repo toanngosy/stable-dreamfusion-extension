@@ -36,3 +36,125 @@ def get_df_models():
             if os.path.isdir(os.path.join(out_dir, found)):
                 output.append(found)
     return output
+
+
+def load_params(model_dir):
+    data = DreamfusionConfig().from_file(model_dir)
+
+    target_values = ["text",
+                     "negative",
+                     "o",
+                     "o2",
+                     "test",
+                     "save_mesh",
+                     "eval_interval",
+                     "workspace",
+                     "guidance",
+                     "seed",
+                     "iters",
+                     "lr",
+                     "ckpt",
+                     "cuda_ray",
+                     "max_steps",
+                     "num_steps",
+                     "upsample_steps",
+                     "update_extra_interval",
+                     "max_ray_batch",
+                     "albedo",
+                     "albedo_iters",
+                     "uniform_sphere_rate",
+                     "bg_radius",
+                     "density_thresh",
+                     "fp16",
+                     "backbone",
+                     "w",
+                     "h",
+                     "jitter_pose",
+                     "bound",
+                     "dt_gamma",
+                     "min_near",
+                     "radius_range",
+                     "fovy_range",
+                     "dir_text",
+                     "suppress_face",
+                     "angle_overhead",
+                     "angle_front",
+                     "lambda_entropy",
+                     "lambda_opacity",
+                     "orient",
+                     "lambda_smooth",
+                     "gui",
+                     "gui_w",
+                     "gui_h",
+                     "gui_radius",
+                     "gui_fovy",
+                     "gui_light_theta",
+                     "gui_light_phi",
+                     "max_spp"
+                     ]
+
+    values = []
+    for target in target_values:
+        if target in data:
+            value = data[target]
+            if target == "max_token_length":
+                value = str(value)
+            values.append(value)
+        else:
+            values.append(None)
+    values.append(f"Loaded params from {model_dir}.")
+    return values
+
+
+def start_training(text,
+                   negative,
+                   o,
+                   o2,
+                   test,
+                   save_mesh,
+                   eval_interval,
+                   workspace,
+                   guidance,
+                   seed,
+                   iters,
+                   lr,
+                   ckpt,
+                   cuda_ray,
+                   max_steps,
+                   num_steps,
+                   upsample_steps,
+                   update_extra_interval,
+                   max_ray_batch,
+                   albedo,
+                   albedo_iters,
+                   uniform_sphere_rate,
+                   bg_radius,
+                   density_thresh,
+                   fp16,
+                   backbone,
+                   w,
+                   h,
+                   jitter_pose,
+                   bound,
+                   dt_gamma,
+                   min_near,
+                   radius_range,
+                   fovy_range,
+                   dir_text,
+                   suppress_face,
+                   angle_overhead,
+                   angle_front,
+                   lambda_entropy,
+                   lambda_opacity,
+                   orient,
+                   lambda_smooth,
+                   gui,
+                   gui_w,
+                   gui_h,
+                   gui_radius,
+                   gui_fovy,
+                   gui_light_theta,
+                   gui_light_phi,
+                   max_spp
+                   ):
+    return "", ""

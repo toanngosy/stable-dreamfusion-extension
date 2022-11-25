@@ -6,7 +6,8 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 
 import modules.script_callbacks as script_callbacks
-#from extensions.stable_dreamfusion_extension.dreamfusion import dreamfusion
+from extensions.stable_dreamfusion_extension.dreamfusion import conversion
+from extensions.stable_dreamfusion_extension.dreamfusion import dreamfusion
 from webui import wrap_gradio_gpu_call
 
 class DreamfusionParameters(BaseModel):
