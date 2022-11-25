@@ -29,7 +29,7 @@ export COMMANDLINE_ARGS=""
 
 # Requirements file to use for stable-diffusion-webui + dreambooth.
 # If you changed the name of the dreambooth extension directory, change it below
-export REQS_FILE="./extensions/stable-dreamfusion-extension/requirements.txt"
+export REQS_FILE="./extensions/stable_dreamfusion_extension/requirements.txt"
 # Uncomment to skip auto-install on run.
 # export DREAMBOOTH_SKIP_INSTALL=True
 # Fixed git repos

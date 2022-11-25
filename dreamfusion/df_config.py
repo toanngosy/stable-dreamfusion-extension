@@ -8,10 +8,9 @@ try:
 except:
     cmd_dreamfusion_models_path = None
 
-class:
-    DreamfusionConfig(dict):
+class DreamfusionConfig(dict):
         def __init__(self, *args, **kwargs):
-            super().__init__(*args, (**kwargs)
+            super().__init__(*args, **kwargs)
             self.name = None
             self.model_name = None
             self.__dict__ = self
