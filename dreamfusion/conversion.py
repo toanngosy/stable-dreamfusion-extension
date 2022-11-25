@@ -24,13 +24,13 @@ import torch
 
 import modules.sd_models
 from modules import paths, shared
-from extensions.sd_dreambooth_extension.dreambooth.dreambooth import get_db_models, printm
-from extensions.sd_dreambooth_extension.dreambooth.db_config import DreamboothConfig
+from extensions.stable_dreamfusion_extension.dreamfusion.dreamfusion import get_db_models, printm
+from extensions.stable_dreamfusion_extension.dreamfusion.db_config import DreamfusionConfig
 
 try:
-    cmd_dreambooth_models_path = shared.cmd_opts.dreambooth_models_path
+    cmd_dreamfusion_models_path = shared.cmd_opts.dreamfusion_models_path
 except:
-    cmd_dreambooth_models_path = None
+    cmd_dreamfusion_models_path = None
 
 try:
     from omegaconf import OmegaConf
@@ -815,7 +815,7 @@ def extract_checkpoint(new_model_name: str, checkpoint_path: str, scheduler_type
     map_location = shared.device
     # Set up our base directory for the model and sanitize our file name
     new_model_name = "".join(x for x in new_model_name if x.isalnum())
-    config = DreamboothConfig().create_new(new_model_name, scheduler_type, checkpoint_path, 0)
+    config = DreamfusionConfig().create_new(new_model_name, scheduler_type, checkpoint_path, 0)
     new_model_dir = create_output_dir(new_model_name, config)
     # Create folder for the 'extracted' diffusion model.
     out_dir = os.path.join(new_model_dir, "working")
@@ -974,11 +974,11 @@ def compile_checkpoint(model_name, vae_path, half_checkpoint):
         if ckpt_dir is not None:
             models_path = ckpt_dir
 
-        config = DreamboothConfig().from_file(model_name)
+        config = DreamfusionConfig().from_file(model_name)
         total_steps = config["revision"]
         if total_steps == 0:
             return "Please train the model first.", ""
-        src_path = os.path.join(os.path.dirname(cmd_dreambooth_models_path) if cmd_dreambooth_models_path else paths.models_path, "dreambooth", model_name, "working")
+        src_path = os.path.join(os.path.dirname(cmd_dreamfusion_models_path) if cmd_dreamfusion_models_path else paths.models_path, "dreamfusion", model_name, "working")
         out_file = os.path.join(models_path, f"{model_name}_{total_steps}.ckpt")
         try:
             diff_to_sd(src_path, vae_path, out_file, half)
@@ -1033,9 +1033,9 @@ def diff_to_sd(model_path, vae_path, checkpoint_name, half=False):
 
 
 def create_output_dir(new_model, config_data):
-    print(f"Creating dreambooth model folder: {new_model}")
-    models_dir = os.path.dirname(cmd_dreambooth_models_path) if cmd_dreambooth_models_path else paths.models_path
-    model_dir = os.path.join(models_dir, "dreambooth", new_model)
+    print(f"Creating dreamfusion model folder: {new_model}")
+    models_dir = os.path.dirname(cmd_dreamfusion_models_path) if cmd_dreamfusion_models_path else paths.models_path
+    model_dir = os.path.join(models_dir, "dreamfusion", new_model)
     output_dir = os.path.join(model_dir, "working")
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)

@@ -148,7 +148,9 @@ def parse_args(input_args=None):
     # env_local_rank = int(os.environ.get("LOCAL_RANK", -1))
     # if env_local_rank != -1 and env_local_rank != args.local_rank:
     #     args.local_rank = env_local_rank
+    return args
 
+def main(args, memory_record):
     if args.o:
         args.fp16 = True
         args.dir_text = True
@@ -168,9 +170,9 @@ def parse_args(input_args=None):
         from stable_dreamfusion.nerf.network import NERFNetwork
     else:
         raise NotImplementedError(f'--backbone {args.backbone} is not implemented')
-    return args
-
-def main(args, memory_record):
+    seed_everything(args.seed)
+    
+    
     args.tokenizer_name = None
     global mem_record
     mem_record = memory_record
@@ -237,6 +239,3 @@ def main(args, memory_record):
 
         max_epoch = np.ceil(args.iters / len(train_loader)).astype(np.int32)
         trainer.train(train_loader, valid_loader, max_epoch)
-
-    
-    pass

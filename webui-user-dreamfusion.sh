@@ -27,11 +27,11 @@ export COMMANDLINE_ARGS=""
 # install command for torch
 # export TORCH_COMMAND="pip install torch==1.12.1+cu116 torchvision==0.13.1+cu116 --extra-index-url https://download.pytorch.org/whl/cu116"
 
-# Requirements file to use for stable-diffusion-webui + dreambooth.
-# If you changed the name of the dreambooth extension directory, change it below
+# Requirements file to use for stable-diffusion-webui + dreamfusion.
+# If you changed the name of the dreamfusion extension directory, change it below
 export REQS_FILE="./extensions/stable_dreamfusion_extension/requirements.txt"
 # Uncomment to skip auto-install on run.
-# export DREAMBOOTH_SKIP_INSTALL=True
+# export DREAMFUSION_SKIP_INSTALL=True
 # Fixed git repos
 #export K_DIFFUSION_PACKAGE=""
 #export GFPGAN_PACKAGE=""
