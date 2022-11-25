@@ -9,7 +9,8 @@ from webui import wrap_gradio_gpu_call
 def on_ui_tabs():
     with gr.Blocks() as dreamfusion_interface:
         with gr.Row(equal_height=True):
-            df_model_dir = gr.Dropdown(label="Model", choices=sorted(get_df_models()))
+            df_model_dir = gr.Dropdown(label='Model', choices=sorted(get_df_models()))
+            df_half_model = gr.Checkbox(label="Half", value=False)
             df_load_params = gr.Button(value="Load Params")
             df_train_embedding = gr.Button(value="Train", variant="primary")
 
@@ -136,6 +137,8 @@ def on_ui_tabs():
                 df_model_dir
             ],
             outputs=[
+                df_model_dir,
+                df_half_model,
                 df_text,
                 df_negative,
                 df_o,
@@ -193,6 +196,8 @@ def on_ui_tabs():
             fn=wrap_gradio_gpu_call(dreamfusion.start_training, extra_outputs=[gr.update()]),
             _js="start_training_dreamfusion",
             inputs=[
+                df_model_dir,
+                df_half_model,
                 df_text,
                 df_negative,
                 df_o,

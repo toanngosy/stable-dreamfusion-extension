@@ -11,6 +11,7 @@ from extensions.stable_dreamfusion_extension.dreamfusion import dreamfusion
 from webui import wrap_gradio_gpu_call
 
 class DreamfusionParameters(BaseModel):
+    df_half_model: bool = False
     df_text: str = "a hamburger"
     df_negative: str
     df_o: bool = False
@@ -95,6 +96,8 @@ def dreamFusionAPI(demo: gr.Blocks, app: FastAPI):
 
     async def train_model(params: DreamfusionParameters):
         fn = wrap_gradio_gpu_call(dreamfusion.start_training(
+            params.df_model_dir,
+            params.df_half_model,
             params.df_text,
             params.df_negative,
             params.df_o,
