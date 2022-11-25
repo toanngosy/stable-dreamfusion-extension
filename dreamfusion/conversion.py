@@ -24,8 +24,8 @@ import torch
 
 import modules.sd_models
 from modules import paths, shared
-from extensions.stable_dreamfusion_extension.dreamfusion.dreamfusion import get_db_models, printm
-from extensions.stable_dreamfusion_extension.dreamfusion.db_config import DreamfusionConfig
+from extensions.stable_dreamfusion_extension.dreamfusion.dreamfusion import get_df_models, printm
+from extensions.stable_dreamfusion_extension.dreamfusion.df_config import DreamfusionConfig
 
 try:
     cmd_dreamfusion_models_path = shared.cmd_opts.dreamfusion_models_path
@@ -861,7 +861,7 @@ def extract_checkpoint(new_model_name: str, checkpoint_path: str, scheduler_type
                         checkpoint = checkpoint["state_dict"]
                 except:
                     print("Couldn't load checkpoint, canceling.")
-                    dirs = get_db_models()
+                    dirs = get_df_models()
                     return gr.Dropdown.update(
                         choices=sorted(dirs)), f"Created working directory for {new_model_name} at {out_dir}.", ""
 
@@ -960,7 +960,7 @@ def extract_checkpoint(new_model_name: str, checkpoint_path: str, scheduler_type
     if shared.sd_model is not None:
         shared.sd_model.to(shared.device)
     printm("Extraction completed.")
-    dirs = get_db_models()
+    dirs = get_df_models()
 
     return gr.Dropdown.update(choices=sorted(dirs), value=new_model_name), f"Created working directory for {new_model_name} at {out_dir}.", ""
 
