@@ -843,9 +843,11 @@ def extract_checkpoint(new_model_name: str, checkpoint_path: str, scheduler_type
                 shared.state.job_no = 8
                 return None, "Unable to find base checkpoint.", ""
             checkpoint = None
-            if shared.cmd_opts.ckptfix or shared.cmd_opts.medvram or shared.cmd_opts.lowvram:
-                printm(f"Using CPU for extraction.")
-                map_location = torch.device('cpu')
+            
+            # TODO: evaluate this, run only on cpu?
+            # if shared.cmd_opts.ckptfix or shared.cmd_opts.medvram or shared.cmd_opts.lowvram:
+            #     printm(f"Using CPU for extraction.")
+            #     map_location = torch.device('cpu')
             try:
                 checkpoint = torch.load(checkpoint_info[0], map_location=map_location)["state_dict"]
                 checkpoint_path = checkpoint_info[0]

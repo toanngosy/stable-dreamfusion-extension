@@ -180,10 +180,67 @@ def start_training(model_dir,
                    gui_light_phi,
                    max_spp
                    ):
+    print('here')
+    print('model_dir', model_dir) 
+    print('half_model', half_model)
+    print('text', text)
+    print('negative', negative)
+    print('o', o)
+    print('o2', o2)
+    print('test', test)
+    print('save_mesh', save_mesh)
+    print('eval_interval', eval_interval)
+    print('workspace', workspace)
+    print('guidance', guidance)
+    print('seed', seed)
+    print('iters', iters)
+    print('lr', lr)
+    print('ckpt', ckpt)
+    print('cuda_ray', cuda_ray)
+    print('max_steps', max_steps)
+    print('num_steps', num_steps)
+    print('upsample_steps', upsample_steps)
+    print('update_extra_interval', update_extra_interval)
+    print('max_ray_batch', max_ray_batch)
+    print('albedo', albedo)
+    print('albedo_iters', albedo_iters)
+    print('uniform_sphere_rate', uniform_sphere_rate)
+    print('bg_radius', bg_radius)
+    print('density_thresh', density_thresh)
+    print('fp16', fp16)
+    print('backbone', backbone)
+    print('w', w)
+    print('h', h)
+    print('jitter_pose', jitter_pose)
+    print('bound', bound)
+    print('dt_gamma', dt_gamma)
+    print('min_near', min_near)
+    print('radius_range', radius_range)
+    print('fovy_range', fovy_range)
+    print('dir_text', dir_text)
+    print('suppress_face', suppress_face)
+    print('angle_overhead', angle_overhead)
+    print('angle_front', angle_front)
+    print('lambda_entropy', lambda_entropy)
+    print('lambda_opacity', lambda_opacity)
+    print('orient', orient)
+    print('lambda_smooth', lambda_smooth)
+    print('gui', gui)
+    print('gui_w', gui_w)
+    print('gui_h', gui_h)
+    print('gui_radius', gui_radius)
+    print('gui_fovy', gui_fovy)
+    print('gui_light_theta', gui_light_theta)
+    print('gui_light_phi', gui_light_phi)
+    print('max_spp', max_spp)
     global mem_record
     if model_dir == "" or model_dir is None:
         print("Invalid model name.")
         return "Create or select a model first.", ""
+    # delete me
+    if model_dir != "":
+        print("Model name goes through.")
+        return "Model here", ""
     
     config = DreamfusionConfig().from_ui(model_dir,
                                          half_model,

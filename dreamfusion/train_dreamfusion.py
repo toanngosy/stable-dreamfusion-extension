@@ -210,7 +210,7 @@ def main(args, memory_record):
             
     
     else:
-        
+        print(args)
         train_loader = NeRFDataset(args, device=device, type='train', H=args.h, W=args.w, size=100).dataloader()
 
         optimizer = lambda model: torch.optim.Adam(model.get_params(args.lr), betas=(0.9, 0.99), eps=1e-15)
@@ -221,7 +221,8 @@ def main(args, memory_record):
 
         if args.guidance == 'stable-diffusion':
             from stable_dreamfusion.nerf.sd import StableDiffusion
-            guidance = StableDiffusion(device)
+            if args.pretrained_model_name_or_path:
+                guidance = StableDiffusion(device, args.pretrained_model_name_or_path)
         elif args.guidance == 'clip':
             from stable_dreamfusion.nerf.clip import CLIP
             guidance = CLIP(device)
