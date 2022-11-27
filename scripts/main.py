@@ -11,7 +11,7 @@ def on_ui_tabs():
         with gr.Row(equal_height=True):
             df_model_dir = gr.Dropdown(label='Model', choices=sorted(get_df_models()))
             df_half_model = gr.Checkbox(label="Half", value=False)
-            df_load_params = gr.Button(value="Load Params")
+            #df_load_params = gr.Button(value="Load Params")
             df_train_embedding = gr.Button(value="Train", variant="primary")
 
         with gr.Row().style(equal_height=False):
@@ -36,56 +36,56 @@ def on_ui_tabs():
                 with gr.Tab("Train Model"):
                     with gr.Column():
                         gr.HTML("Parameter")
-                        df_text = gr.Textbox(label='text prompt', placeholder="text prompt")
-                        df_negative = gr.Textbox(label='negative', placeholder="negative text prompt")
-                        df_o = gr.Textbox(label='o', placeholder="equals --fp16 --cuda_ray --dir_text")
-                        df_o2 = gr.Textbox(label='o2', placeholder="equals --backbone vanilla --dir_text")
-                        df_test = gr.Textbox(label='test', placeholder="test mode")
-                        df_save_mesh = gr.Textbox(label='save_mesh', placeholder="export an obj mesh with texture")
-                        df_eval_interval = gr.Textbox(label='eval_interval', placeholder="evaluate on the valid set every interval epochs")
-                        df_workspace = gr.Textbox(label='workspace', placeholder="workspace")
-                        df_guidance = gr.Textbox(label='guidance', placeholder="choose from [stable-diffusion, clip]")
-                        df_seed = gr.Textbox(label='seed', placeholder="seed")
-                        df_iters = gr.Textbox(label='iters', placeholder="training iters")
-                        df_lr = gr.Textbox(label='lr', placeholder="initial learning rate")
-                        df_ckpt = gr.Textbox(label='ckpt', placeholder="latest")
-                        df_cuda_ray = gr.Textbox(label='cuda_ray', placeholder="use CUDA raymarching instead of pytorch")
-                        df_max_steps = gr.Textbox(label='max_steps', placeholder="max num steps sampled per ray (only valid when using --cuda_ray)")
-                        df_num_steps = gr.Textbox(label='num_steps', placeholder="num steps sampled per ray (only valid when not using --cuda_ray)")
-                        df_upsample_steps = gr.Textbox(label='upsample_steps', placeholder="num steps up-sampled per ray (only valid when not using --cuda_ray)")
-                        df_update_extra_interval = gr.Textbox(label='update_extra_interval', placeholder="iter interval to update extra status (only valid when using --cuda_ray)")
-                        df_max_ray_batch = gr.Textbox(label='max_ray_batch', placeholder="batch size of rays at inference to avoid OOM (only valid when not using --cuda_ray)")
-                        df_albedo = gr.Textbox(label='albedo', placeholder="only use albedo shading to train, overrides --albedo_iters")
-                        df_albedo_iters = gr.Textbox(label='albedo_iters', placeholder="training iters that only use albedo shading")
-                        df_uniform_sphere_rate = gr.Textbox(label='uniform_sphere_rate', placeholder="likelihood of sampling camera location uniformly on the sphere surface area")
-                        df_bg_radius = gr.Textbox(label='bg_radius', placeholder="if positive, use a background model at sphere(bg_radius)")
-                        df_density_thresh = gr.Textbox(label='density_thresh', placeholder="threshold for density grid to be occupied")
-                        df_fp16 = gr.Textbox(label='fp16', placeholder="use amp mixed precision training")
-                        df_backbone = gr.Textbox(label='backbone', placeholder="nerf backbone, choose from [grid, vanilla]")
-                        df_w = gr.Textbox(label='w', placeholder="render width for NeRF in training")
-                        df_h = gr.Textbox(label='h', placeholder="render height for NeRF in training")
-                        df_jitter_pose = gr.Textbox(label='jitter_pose', placeholder="add jitters to the randomly sampled camera poses")
-                        df_bound = gr.Textbox(label='bound', placeholder="assume the scene is bounded in box(-bound, bound)")
-                        df_dt_gamma = gr.Textbox(label='dt_gamma', placeholder="dt_gamma (>=0) for adaptive ray marching. set to 0 to disable, >0 to accelerate rendering (but usually with worse quality)")
-                        df_min_near = gr.Textbox(label='min_near', placeholder="minimum near distance for camera")
-                        df_radius_range = gr.Textbox(label='radius_range', placeholder="training camera radius range")
-                        df_fovy_range = gr.Textbox(label='fovy_range', placeholder="training camera fovy range")
-                        df_dir_text = gr.Textbox(label='dir_text', placeholder="direction-encode the text prompt, by appending front/side/back/overhead view")
-                        df_suppress_face = gr.Textbox(label='suppress_face', placeholder="also use negative dir text prompt.")
-                        df_angle_overhead = gr.Textbox(label='angle_overhead', placeholder="[0, angle_overhead] is the overhead region")
-                        df_angle_front = gr.Textbox(label='angle_front', placeholder="[0, angle_front] is the front region, [180, 180+angle_front] the back region, otherwise the side region.")
-                        df_lambda_entropy = gr.Textbox(label='lambda_entropy', placeholder="loss scale for alpha entropy")
-                        df_lambda_opacity = gr.Textbox(label='lambda_opacity', placeholder="loss scale for alpha value")
-                        df_orient = gr.Textbox(label='orient', placeholder="loss scale for orientation")
-                        df_lambda_smooth = gr.Textbox(label='lambda_smooth', placeholder="loss scale for surface smoothness")
-                        df_gui = gr.Textbox(label='gui', placeholder="start a GUI")
-                        df_gui_w = gr.Textbox(label='gui_w', placeholder="GUI width")
-                        df_gui_h = gr.Textbox(label='gui_h', placeholder="GUI height")
-                        df_gui_radius = gr.Textbox(label='gui_radius', placeholder="default GUI camera radius from center")
-                        df_gui_fovy = gr.Textbox(label='gui_fovy', placeholder="default GUI camera fovy")
-                        df_gui_light_theta = gr.Textbox(label='gui_light_theta', placeholder="default GUI light direction in [0, 180], corresponding to elevation [90, -90]")
-                        df_gui_light_phi = gr.Textbox(label='gui_light_phi', placeholder="default GUI light direction in [0, 360), azimuth")
-                        df_max_spp = gr.Textbox(label='max_spp', placeholder="GUI rendering max sample per pixel")
+                        df_text = gr.Textbox(label='text prompt', default='a hamburger', placeholder="text prompt")
+                        df_negative = gr.Textbox(label='negative', default='', placeholder="negative text prompt")
+                        df_o = gr.Checkbox(label='o', value=True, placeholder="equals --fp16 --cuda_ray --dir_text")
+                        df_o2 = gr.Checkbox(label='o2', value=False, placeholder="equals --backbone vanilla --dir_text")
+                        df_test = gr.Checkbox(label='test', value=False, placeholder="test mode")
+                        df_save_mesh = gr.Checkbox(label='save_mesh', value=False, placeholder="export an obj mesh with texture")
+                        df_eval_interval = gr.Number(label='eval_interval', default=10, placeholder="evaluate on the valid set every interval epochs")
+                        df_workspace = gr.Textbox(label='workspace', default='workspace', placeholder="workspace")
+                        df_guidance = gr.Textbox(label='guidance', default='stable-diffusion', placeholder="choose from [stable-diffusion, clip]")
+                        df_seed = gr.Number(label='seed', default=0, placeholder="seed")
+                        df_iters = gr.Number(label='iters', default=10000, placeholder="training iters")
+                        df_lr = gr.Number(label='lr', default=1e-3, placeholder="initial learning rate")
+                        df_ckpt = gr.Textbox(label='ckpt', default='latest', placeholder="ckpt")
+                        df_cuda_ray = gr.Checkbox(label='cuda_ray', value=False, placeholder="use CUDA raymarching instead of pytorch")
+                        df_max_steps = gr.Number(label='max_steps', default=512, placeholder="max num steps sampled per ray (only valid when using --cuda_ray)")
+                        df_num_steps = gr.Number(label='num_steps', default=64, placeholder="num steps sampled per ray (only valid when not using --cuda_ray)")
+                        df_upsample_steps = gr.Number(label='upsample_steps', default=32, placeholder="num steps up-sampled per ray (only valid when not using --cuda_ray)")
+                        df_update_extra_interval = gr.Number(label='update_extra_interval', default=16, placeholder="iter interval to update extra status (only valid when using --cuda_ray)")
+                        df_max_ray_batch = gr.Number(label='max_ray_batch', default=4096, placeholder="batch size of rays at inference to avoid OOM (only valid when not using --cuda_ray)")
+                        df_albedo = gr.Checkbox(label='albedo', default=False, placeholder="only use albedo shading to train, overrides --albedo_iters")
+                        df_albedo_iters = gr.Number(label='albedo_iters', default=1000, placeholder="training iters that only use albedo shading")
+                        df_uniform_sphere_rate = gr.Number(label='uniform_sphere_rate', default=0.5, placeholder="likelihood of sampling camera location uniformly on the sphere surface area")
+                        df_bg_radius = gr.Number(label='bg_radius', default=1.4, placeholder="if positive, use a background model at sphere(bg_radius)")
+                        df_density_thresh = gr.Number(label='density_thresh', default=10, placeholder="threshold for density grid to be occupied")
+                        df_fp16 = gr.Checkbox(label='fp16', default=False, placeholder="use amp mixed precision training")
+                        df_backbone = gr.Textbox(label='backbone', default='grid', placeholder="nerf backbone, choose from [grid, vanilla]")
+                        df_w = gr.Number(label='w', default=64, placeholder="render width for NeRF in training")
+                        df_h = gr.Number(label='h', default=64, placeholder="render height for NeRF in training")
+                        df_jitter_pose = gr.Checkbox(label='jitter_pose', default=False, placeholder="add jitters to the randomly sampled camera poses")
+                        df_bound = gr.Number(label='bound', default=1, placeholder="assume the scene is bounded in box(-bound, bound)")
+                        df_dt_gamma = gr.Number(label='dt_gamma', default=0, placeholder="dt_gamma (>=0) for adaptive ray marching. set to 0 to disable, >0 to accelerate rendering (but usually with worse quality)")
+                        df_min_near = gr.Number(label='min_near', default=0.1, placeholder="minimum near distance for camera")
+                        df_radius_range = gr.Textbox(label='radius_range', default=[1.0, 1.5], placeholder="training camera radius range")
+                        df_fovy_range = gr.Textbox(label='fovy_range', default=[40, 70], placeholder="training camera fovy range")
+                        df_dir_text = gr.Checkbox(label='dir_text', default=False, placeholder="direction-encode the text prompt, by appending front/side/back/overhead view")
+                        df_suppress_face = gr.Checkbox(label='suppress_face', default=False, placeholder="also use negative dir text prompt.")
+                        df_angle_overhead = gr.Number(label='angle_overhead', default=30, placeholder="[0, angle_overhead] is the overhead region")
+                        df_angle_front = gr.Number(label='angle_front', default=60, placeholder="[0, angle_front] is the front region, [180, 180+angle_front] the back region, otherwise the side region.")
+                        df_lambda_entropy = gr.Number(label='lambda_entropy', default=1e-4, placeholder="loss scale for alpha entropy")
+                        df_lambda_opacity = gr.Number(label='lambda_opacity', default=0, placeholder="loss scale for alpha value")
+                        df_orient = gr.Number(label='orient', default=1e-2, placeholder="loss scale for orientation")
+                        df_lambda_smooth = gr.Number(label='lambda_smooth', default=0, placeholder="loss scale for surface smoothness")
+                        df_gui = gr.Checkbox(label='gui',  default=False, placeholder="start a GUI")
+                        df_gui_w = gr.Number(label='gui_w', default=800, placeholder="GUI width")
+                        df_gui_h = gr.Number(label='gui_h', default=800, placeholder="GUI height")
+                        df_gui_radius = gr.Number(label='gui_radius', default=3, placeholder="default GUI camera radius from center")
+                        df_gui_fovy = gr.Number(label='gui_fovy', default=60, placeholder="default GUI camera fovy")
+                        df_gui_light_theta = gr.Number(label='gui_light_theta', default=60, placeholder="default GUI light direction in [0, 180], corresponding to elevation [90, -90]")
+                        df_gui_light_phi = gr.Number(label='gui_light_phi', default=0, placeholder="default GUI light direction in [0, 360), azimuth")
+                        df_max_spp = gr.Number(label='max_spp', default=1, placeholder="GUI rendering max sample per pixel")
                                 
             with gr.Column(variant="panel"):
                 df_status = gr.HTML(elem_id="df_status", value="")
@@ -131,66 +131,66 @@ def on_ui_tabs():
             ]
         )
 
-        df_load_params.click(
-            fn=dreamfusion.load_params,
-            inputs=[
-                df_model_dir
-            ],
-            outputs=[
-                df_model_dir,
-                df_half_model,
-                df_text,
-                df_negative,
-                df_o,
-                df_o2,
-                df_test,
-                df_save_mesh,
-                df_eval_interval,
-                df_workspace,
-                df_guidance,
-                df_seed,
-                df_iters,
-                df_lr,
-                df_ckpt,
-                df_cuda_ray,
-                df_max_steps,
-                df_num_steps,
-                df_upsample_steps,
-                df_update_extra_interval,
-                df_max_ray_batch,
-                df_albedo,
-                df_albedo_iters,
-                df_uniform_sphere_rate,
-                df_bg_radius,
-                df_density_thresh,
-                df_fp16,
-                df_backbone,
-                df_w,
-                df_h,
-                df_jitter_pose,
-                df_bound,
-                df_dt_gamma,
-                df_min_near,
-                df_radius_range,
-                df_fovy_range,
-                df_dir_text,
-                df_suppress_face,
-                df_angle_overhead,
-                df_angle_front,
-                df_lambda_entropy,
-                df_lambda_opacity,
-                df_orient,
-                df_lambda_smooth,
-                df_gui,
-                df_gui_w,
-                df_gui_h,
-                df_gui_radius,
-                df_gui_fovy,
-                df_gui_light_theta,
-                df_gui_light_phi,
-                df_max_spp
-            ]
-        )
+        # df_load_params.click(
+        #     fn=dreamfusion.load_params,
+        #     inputs=[
+        #         df_model_dir
+        #     ],
+        #     outputs=[
+        #         df_model_dir,
+        #         df_half_model,
+        #         df_text,
+        #         df_negative,
+        #         df_o,
+        #         df_o2,
+        #         df_test,
+        #         df_save_mesh,
+        #         df_eval_interval,
+        #         df_workspace,
+        #         df_guidance,
+        #         df_seed,
+        #         df_iters,
+        #         df_lr,
+        #         df_ckpt,
+        #         df_cuda_ray,
+        #         df_max_steps,
+        #         df_num_steps,
+        #         df_upsample_steps,
+        #         df_update_extra_interval,
+        #         df_max_ray_batch,
+        #         df_albedo,
+        #         df_albedo_iters,
+        #         df_uniform_sphere_rate,
+        #         df_bg_radius,
+        #         df_density_thresh,
+        #         df_fp16,
+        #         df_backbone,
+        #         df_w,
+        #         df_h,
+        #         df_jitter_pose,
+        #         df_bound,
+        #         df_dt_gamma,
+        #         df_min_near,
+        #         df_radius_range,
+        #         df_fovy_range,
+        #         df_dir_text,
+        #         df_suppress_face,
+        #         df_angle_overhead,
+        #         df_angle_front,
+        #         df_lambda_entropy,
+        #         df_lambda_opacity,
+        #         df_orient,
+        #         df_lambda_smooth,
+        #         df_gui,
+        #         df_gui_w,
+        #         df_gui_h,
+        #         df_gui_radius,
+        #         df_gui_fovy,
+        #         df_gui_light_theta,
+        #         df_gui_light_phi,
+        #         df_max_spp
+        #     ]
+        # )
 
         df_train_embedding.click(
             fn=wrap_gradio_gpu_call(dreamfusion.start_training, extra_outputs=[gr.update()]),
