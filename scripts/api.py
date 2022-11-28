@@ -64,7 +64,7 @@ class DreamfusionParameters(BaseModel):
     
     df_lambda_entropy: float = 1e-4
     df_lambda_opacity: float = 0
-    df_orient: float = 1e-2
+    df_lambda_orient: float = 1e-2
     df_lambda_smooth: float = 0
     
     # GUI options
@@ -139,7 +139,7 @@ def dreamFusionAPI(demo: gr.Blocks, app: FastAPI):
             params.df_angle_front,
             params.df_lambda_entropy,
             params.df_lambda_opacity,
-            params.df_orient,
+            params.df_lambda_orient,
             params.df_lambda_smooth,
             params.df_gui,
             params.df_gui_w,

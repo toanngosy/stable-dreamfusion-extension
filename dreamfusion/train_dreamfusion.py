@@ -31,15 +31,12 @@ from tqdm.auto import tqdm
 from transformers import CLIPTextModel, CLIPTokenizer
 
 from extensions.stable_dreamfusion_extension.dreamfusion import xattention
-from extensions.stable_dreamfusion_extension.dreamfusion.dreamfusion import dumb_safety, save_checkpoint, list_features, \
-    is_image, printm
+from extensions.stable_dreamfusion_extension.dreamfusion.dreamfusion import printm #, dumb_safety, save_checkpoint, list_features, is_image
 
 from modules import shared
 from stable_dreamfusion.nerf.provider import NeRFDataset
 from stable_dreamfusion.nerf.utils import *
-from stable_dreamfusion.nerf.optimizer import Shampoo
-
-
+from stable_dreamfusion.optimizer import Shampoo
 
 
 # Custom stuff
@@ -165,78 +162,107 @@ def main(args, memory_record):
         args.albedo_iters = args.iters
     
     if args.backbone == 'vanilla':
-        from stable_dreamfusion.nerf.network import NERFNetwork
+        from stable_dreamfusion.nerf.network import NeRFNetwork
     elif args.backbone == 'grid':
-        from stable_dreamfusion.nerf.network import NERFNetwork
+        from stable_dreamfusion.nerf.network_grid import NeRFNetwork
     else:
         raise NotImplementedError(f'--backbone {args.backbone} is not implemented')
     seed_everything(args.seed)
-    
-    
-    args.tokenizer_name = None
-    global mem_record
-    mem_record = memory_record
-    logging_dir = Path(args.output_dir, "logging")
-    args.max_token_length = int(args.max_token_length)
-    if not args.pad_tokens and args.max_token_length > 75:
-        logger.debug("Cannot raise token length limit above 75 when pad_tokens=False")
-
-    # if args.attention == "xformers":
-    #     xattention.replace_unet_cross_attn_to_xformers()
-    # elif args.attention == "flash_attention":
-    #     xattention.replace_unet_cross_attn_to_flash_attention()
-    # else:
-    #     xattention.replace_unet_cross_attn_to_default()
-
-    # weight_dtype = torch.float32
-    # if args.mixed_precision == "fp16":
-    #     weight_dtype = torch.float16
-    # elif args.mixed_precision == "bf16":
-    #     weight_dtype = torch.bfloat16
-    
-    model = NERFNetwork(args)
+    model = NeRFNetwork(args)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    if args.test:
-        guidance = None # no need to load guidance model at test
+    train_loader = NeRFDataset(args, device=device, type='train', H=args.h, W=args.w, size=100).dataloader()
 
-        trainer = Trainer('df', args, model, guidance, device=device, workspace=args.workspace, fp16=args.fp16, use_checkpoint=args.ckpt)
+    optimizer = lambda model: torch.optim.Adam(model.get_params(args.lr), betas=(0.9, 0.99), eps=1e-15)
+    # optimizer = lambda model: Shampoo(model.get_params(opt.lr))
+
+    scheduler = lambda optimizer: optim.lr_scheduler.LambdaLR(optimizer, lambda iter: 0.1 ** min(iter / args.iters, 1))
+    # scheduler = lambda optimizer: optim.lr_scheduler.OneCycleLR(optimizer, max_lr=opt.lr, total_steps=opt.iters, pct_start=0.1)
+
+    if args.guidance == 'stable-diffusion':
+        from stable_dreamfusion.nerf.sd import StableDiffusion
+        guidance = StableDiffusion(device, args.pretrained_model_name_or_path)
+    elif args.guidance == 'clip':
+        from stable_dreamfusion.nerf.clip import CLIP
+        guidance = CLIP(device)
+    else:
+        raise NotImplementedError(f'--guidance {args.guidance} is not implemented.')
+
+    trainer = Trainer('df', args, model, guidance, device=device, 
+                      workspace=args.workspace, optimizer=optimizer, 
+                      ema_decay=None, fp16=args.fp16, lr_scheduler=scheduler, 
+                      use_checkpoint=args.ckpt, eval_interval=args.eval_interval, 
+                      scheduler_update_every_step=True)
+    valid_loader = NeRFDataset(args, device=device, type='val', H=args.gui_h, W=args.gui_h, size=5).dataloader()
+
+    max_epoch = np.ceil(args.iters / len(train_loader)).astype(np.int32)
+    trainer.train(train_loader, valid_loader, max_epoch)
+
+    return args, mem_record
+    
+    # args.tokenizer_name = None
+    # global mem_record
+    # mem_record = memory_record
+    # logging_dir = Path(args.output_dir, "logging")
+    # args.max_token_length = int(args.max_token_length)
+    # if not args.pad_tokens and args.max_token_length > 75:
+    #     logger.debug("Cannot raise token length limit above 75 when pad_tokens=False")
+
+    # # if args.attention == "xformers":
+    # #     xattention.replace_unet_cross_attn_to_xformers()
+    # # elif args.attention == "flash_attention":
+    # #     xattention.replace_unet_cross_attn_to_flash_attention()
+    # # else:
+    # #     xattention.replace_unet_cross_attn_to_default()
+
+    # # weight_dtype = torch.float32
+    # # if args.mixed_precision == "fp16":
+    # #     weight_dtype = torch.float16
+    # # elif args.mixed_precision == "bf16":
+    # #     weight_dtype = torch.bfloat16
+    
+    # model = NERFNetwork(args)
+    # device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    # if args.test:
+    #     guidance = None # no need to load guidance model at test
+
+    #     trainer = Trainer('df', args, model, guidance, device=device, workspace=args.workspace, fp16=args.fp16, use_checkpoint=args.ckpt)
 
 
-        test_loader = NeRFDataset(args, device=device, type='test', H=args.H, W=args.W, size=100).dataloader()
-        trainer.test(test_loader)
+    #     test_loader = NeRFDataset(args, device=device, type='test', H=args.H, W=args.W, size=100).dataloader()
+    #     trainer.test(test_loader)
         
-        if args.save_mesh:
-            trainer.save_mesh(resolution=256)
+    #     if args.save_mesh:
+    #         trainer.save_mesh(resolution=256)
             
     
-    else:
-        print(args)
-        train_loader = NeRFDataset(args, device=device, type='train', H=args.h, W=args.w, size=100).dataloader()
+    # else:
+    #     print(args)
+    #     train_loader = NeRFDataset(args, device=device, type='train', H=args.h, W=args.w, size=100).dataloader()
 
-        optimizer = lambda model: torch.optim.Adam(model.get_params(args.lr), betas=(0.9, 0.99), eps=1e-15)
-        # optimizer = lambda model: Shampoo(model.get_params(opt.lr))
+    #     optimizer = lambda model: torch.optim.Adam(model.get_params(args.lr), betas=(0.9, 0.99), eps=1e-15)
+    #     # optimizer = lambda model: Shampoo(model.get_params(opt.lr))
 
-        scheduler = lambda optimizer: optim.lr_scheduler.LambdaLR(optimizer, lambda iter: 0.1 ** min(iter / args.iters, 1))
-        # scheduler = lambda optimizer: optim.lr_scheduler.OneCycleLR(optimizer, max_lr=opt.lr, total_steps=opt.iters, pct_start=0.1)
+    #     scheduler = lambda optimizer: optim.lr_scheduler.LambdaLR(optimizer, lambda iter: 0.1 ** min(iter / args.iters, 1))
+    #     # scheduler = lambda optimizer: optim.lr_scheduler.OneCycleLR(optimizer, max_lr=opt.lr, total_steps=opt.iters, pct_start=0.1)
 
-        if args.guidance == 'stable-diffusion':
-            from stable_dreamfusion.nerf.sd import StableDiffusion
-            if args.pretrained_model_name_or_path:
-                guidance = StableDiffusion(device, args.pretrained_model_name_or_path)
-        elif args.guidance == 'clip':
-            from stable_dreamfusion.nerf.clip import CLIP
-            guidance = CLIP(device)
-        else:
-            raise NotImplementedError(f'--guidance {args.guidance} is not implemented.')
+    #     if args.guidance == 'stable-diffusion':
+    #         from stable_dreamfusion.nerf.sd import StableDiffusion
+    #         if args.pretrained_model_name_or_path:
+    #             guidance = StableDiffusion(device, args.pretrained_model_name_or_path)
+    #     elif args.guidance == 'clip':
+    #         from stable_dreamfusion.nerf.clip import CLIP
+    #         guidance = CLIP(device)
+    #     else:
+    #         raise NotImplementedError(f'--guidance {args.guidance} is not implemented.')
 
-        trainer = Trainer('df', args, model, guidance, 
-                          device=device, workspace=args.workspace, 
-                          optimizer=optimizer, ema_decay=None, 
-                          fp16=args.fp16, lr_scheduler=scheduler, 
-                          use_checkpoint=args.ckpt, eval_interval=args.eval_interval, 
-                          scheduler_update_every_step=True)
+    #     trainer = Trainer('df', args, model, guidance, 
+    #                       device=device, workspace=args.workspace, 
+    #                       optimizer=optimizer, ema_decay=None, 
+    #                       fp16=args.fp16, lr_scheduler=scheduler, 
+    #                       use_checkpoint=args.ckpt, eval_interval=args.eval_interval, 
+    #                       scheduler_update_every_step=True)
 
-        valid_loader = NeRFDataset(args, device=device, type='val', H=args.H, W=args.W, size=5).dataloader()
+    #     valid_loader = NeRFDataset(args, device=device, type='val', H=args.H, W=args.W, size=5).dataloader()
 
-        max_epoch = np.ceil(args.iters / len(train_loader)).astype(np.int32)
-        trainer.train(train_loader, valid_loader, max_epoch)
+    #     max_epoch = np.ceil(args.iters / len(train_loader)).astype(np.int32)
+    #     trainer.train(train_loader, valid_loader, max_epoch)

@@ -36,6 +36,7 @@ def on_ui_tabs():
                 with gr.Tab("Train Model"):
                     with gr.Column():
                         gr.HTML("Parameter")
+                        df_pretrained_vae_name_or_path = gr.Textbox(label='Pretrained VAE Name or Path', value="", placeholder="Leave blank to use base model VAE.")
                         df_text = gr.Textbox(label='text prompt', value='a hamburger', default='', placeholder="text prompt")
                         df_negative = gr.Textbox(label='negative', value='', default='', placeholder="negative text prompt")
                         df_o = gr.Checkbox(label='o', value=True, placeholder="equals --fp16 --cuda_ray --dir_text")
@@ -53,7 +54,7 @@ def on_ui_tabs():
                         df_max_steps = gr.Number(label='max_steps', value=512, default=512, precision=0, placeholder="max num steps sampled per ray (only valid when using --cuda_ray)")
                         df_num_steps = gr.Number(label='num_steps', value=64, default=64, precision=0, placeholder="num steps sampled per ray (only valid when not using --cuda_ray)")
                         df_upsample_steps = gr.Number(label='upsample_steps', value=32, default=32, precision=0, placeholder="num steps up-sampled per ray (only valid when not using --cuda_ray)")
-                        df_update_extra_interval = gr.Number(label='update_extra_interval', value=0, precision=0, default=16, placeholder="iter interval to update extra status (only valid when using --cuda_ray)")
+                        df_update_extra_interval = gr.Number(label='update_extra_interval', value=16, precision=0, default=16, placeholder="iter interval to update extra status (only valid when using --cuda_ray)")
                         df_max_ray_batch = gr.Number(label='max_ray_batch', value=4096, default=4096, precision=0, placeholder="batch size of rays at inference to avoid OOM (only valid when not using --cuda_ray)")
                         df_albedo = gr.Checkbox(label='albedo', value=False, placeholder="only use albedo shading to train, overrides --albedo_iters")
                         df_albedo_iters = gr.Number(label='albedo_iters', value=1000, default=1000, precision=0, placeholder="training iters that only use albedo shading")
@@ -76,7 +77,7 @@ def on_ui_tabs():
                         df_angle_front = gr.Number(label='angle_front', value=60, default=60, placeholder="[0, angle_front] is the front region, [180, 180+angle_front] the back region, otherwise the side region.")
                         df_lambda_entropy = gr.Number(label='lambda_entropy', value=1e-4, default=1e-4, placeholder="loss scale for alpha entropy")
                         df_lambda_opacity = gr.Number(label='lambda_opacity', value=0, default=0, placeholder="loss scale for alpha value")
-                        df_orient = gr.Number(label='orient', value=1e-2, default=1e-2, placeholder="loss scale for orientation")
+                        df_lambda_orient = gr.Number(label='lambda_orient', value=1e-2, default=1e-2, placeholder="loss scale for orientation")
                         df_lambda_smooth = gr.Number(label='lambda_smooth', value=0, default=0, placeholder="loss scale for surface smoothness")
                         df_gui = gr.Checkbox(label='gui', value=False, placeholder="start a GUI")
                         df_gui_w = gr.Number(label='gui_w', value=800, default=800, precision=0, placeholder="GUI width")
@@ -179,7 +180,7 @@ def on_ui_tabs():
         #         df_angle_front,
         #         df_lambda_entropy,
         #         df_lambda_opacity,
-        #         df_orient,
+        #         df_lambda_orient,
         #         df_lambda_smooth,
         #         df_gui,
         #         df_gui_w,
@@ -197,6 +198,7 @@ def on_ui_tabs():
             _js="start_training_dreamfusion",
             inputs=[
                 df_model_dir,
+                df_pretrained_vae_name_or_path,
                 df_half_model,
                 df_text,
                 df_negative,
@@ -238,7 +240,7 @@ def on_ui_tabs():
                 df_angle_front,
                 df_lambda_entropy,
                 df_lambda_opacity,
-                df_orient,
+                df_lambda_orient,
                 df_lambda_smooth,
                 df_gui,
                 df_gui_w,
