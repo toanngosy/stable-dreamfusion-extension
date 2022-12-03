@@ -88,6 +88,7 @@ def load_params(model_dir):
                      "density_thresh",
                      "fp16",
                      "backbone",
+                     "sd_version",
                      "w",
                      "h",
                      "jitter_pose",
@@ -156,6 +157,7 @@ def start_training(model_dir,
                    density_thresh,
                    fp16,
                    backbone,
+                   sd_version,
                    w,
                    h,
                    jitter_pose,
@@ -271,6 +273,7 @@ def start_training(model_dir,
                                          density_thresh,
                                          fp16,
                                          backbone,
+                                         sd_version,
                                          w,
                                          h,
                                          jitter_pose,
@@ -318,6 +321,7 @@ def start_training(model_dir,
     torch.cuda.empty_cache()
     gc.collect()
     printm("VRAM cleared.", True)
+    total_steps = config.revision
     shared.state.textinfo = "Initializing dreamfusion training..."
     from extensions.stable_dreamfusion_extension.dreamfusion.train_dreamfusion import main
     config, mem_record = main(config, mem_record)

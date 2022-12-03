@@ -63,6 +63,7 @@ def on_ui_tabs():
                         df_density_thresh = gr.Number(label='density_thresh', value=10, default=10, placeholder="threshold for density grid to be occupied")
                         df_fp16 = gr.Checkbox(label='fp16',  value=False, placeholder="use amp mixed precision training")
                         df_backbone = gr.Textbox(label='backbone', value='grid', default='grid', placeholder="nerf backbone, choose from [grid, vanilla]")
+                        df_sd_version = gr.Textbox(label='sd_version', value='2.0', default='2.0', placeholder="sd version, choose from [1.5, 2.0]")
                         df_w = gr.Number(label='w', value=64, default=64, precision=0, placeholder="render width for NeRF in training")
                         df_h = gr.Number(label='h', value=64, default=64, precision=0, placeholder="render height for NeRF in training")
                         df_jitter_pose = gr.Checkbox(label='jitter_pose', value=False, placeholder="add jitters to the randomly sampled camera poses")
@@ -226,6 +227,7 @@ def on_ui_tabs():
                 df_density_thresh,
                 df_fp16,
                 df_backbone,
+                df_sd_version,
                 df_w,
                 df_h,
                 df_jitter_pose,

@@ -104,7 +104,8 @@ def parse_args(input_args=None):
     parser.add_argument('--density_thresh', type=float, default=10, help="threshold for density grid to be occupied")
     # network backbone
     parser.add_argument('--fp16', action='store_true', help="use amp mixed precision training")
-    parser.add_argument('--backbone', type=str, default='grid', help="nerf backbone, choose from [grid, vanilla]")
+    parser.add_argument('--backbone', type=str, default='grid', choices=['grid', 'vanilla'], help="nerf backbone")
+    parser.add_argument('--sd_version', type=str, default='2.0', choices=['1.5', '2.0'], help="stable diffusion version")
     # rendering resolution in training, decrease this if CUDA OOM.
     parser.add_argument('--w', type=int, default=64, help="render width for NeRF in training")
     parser.add_argument('--h', type=int, default=64, help="render height for NeRF in training")
@@ -151,7 +152,7 @@ def main(args, memory_record):
     if args.o:
         args.fp16 = True
         args.dir_text = True
-        args.cuda_ray =True
+        args.cuda_ray = True
     elif args.o2:
         if args.albedo:
             args.fp16 = True
@@ -170,32 +171,44 @@ def main(args, memory_record):
     seed_everything(args.seed)
     model = NeRFNetwork(args)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    train_loader = NeRFDataset(args, device=device, type='train', H=args.h, W=args.w, size=100).dataloader()
+    if args.test:
+        guidance = None # no need to load guidance model at test
 
-    optimizer = lambda model: torch.optim.Adam(model.get_params(args.lr), betas=(0.9, 0.99), eps=1e-15)
-    # optimizer = lambda model: Shampoo(model.get_params(opt.lr))
+        trainer = Trainer('df', args, model, guidance, device=device, workspace=args.workspace, fp16=args.fp16, use_checkpoint=args.ckpt)
 
-    scheduler = lambda optimizer: optim.lr_scheduler.LambdaLR(optimizer, lambda iter: 0.1 ** min(iter / args.iters, 1))
-    # scheduler = lambda optimizer: optim.lr_scheduler.OneCycleLR(optimizer, max_lr=opt.lr, total_steps=opt.iters, pct_start=0.1)
 
-    if args.guidance == 'stable-diffusion':
-        from stable_dreamfusion.nerf.sd import StableDiffusion
-        guidance = StableDiffusion(device, args.pretrained_model_name_or_path)
-    elif args.guidance == 'clip':
-        from stable_dreamfusion.nerf.clip import CLIP
-        guidance = CLIP(device)
+        test_loader = NeRFDataset(args, device=device, type='test', H=args.gui_h, W=args.gui_w, size=100).dataloader()
+        trainer.test(test_loader)
+        
+        if args.save_mesh:
+            trainer.save_mesh(resolution=256)
     else:
-        raise NotImplementedError(f'--guidance {args.guidance} is not implemented.')
+        train_loader = NeRFDataset(args, device=device, type='train', H=args.h, W=args.w, size=100).dataloader()
 
-    trainer = Trainer('df', args, model, guidance, device=device, 
-                      workspace=args.workspace, optimizer=optimizer, 
-                      ema_decay=None, fp16=args.fp16, lr_scheduler=scheduler, 
-                      use_checkpoint=args.ckpt, eval_interval=args.eval_interval, 
-                      scheduler_update_every_step=True)
-    valid_loader = NeRFDataset(args, device=device, type='val', H=args.gui_h, W=args.gui_h, size=5).dataloader()
+        optimizer = lambda model: torch.optim.Adam(model.get_params(args.lr), betas=(0.9, 0.99), eps=1e-15)
+        # optimizer = lambda model: Shampoo(model.get_params(opt.lr))
 
-    max_epoch = np.ceil(args.iters / len(train_loader)).astype(np.int32)
-    trainer.train(train_loader, valid_loader, max_epoch)
+        scheduler = lambda optimizer: optim.lr_scheduler.LambdaLR(optimizer, lambda iter: 0.1 ** min(iter / args.iters, 1))
+        # scheduler = lambda optimizer: optim.lr_scheduler.OneCycleLR(optimizer, max_lr=opt.lr, total_steps=opt.iters, pct_start=0.1)
+
+        if args.guidance == 'stable-diffusion':
+            from stable_dreamfusion.nerf.sd import StableDiffusion
+            guidance = StableDiffusion(device, args.sd_version, args.pretrained_model_name_or_path)
+        elif args.guidance == 'clip':
+            from stable_dreamfusion.nerf.clip import CLIP
+            guidance = CLIP(device)
+        else:
+            raise NotImplementedError(f'--guidance {args.guidance} is not implemented.')
+
+        trainer = Trainer('df', args, model, guidance, device=device, 
+                        workspace=args.workspace, optimizer=optimizer, 
+                        ema_decay=None, fp16=args.fp16, lr_scheduler=scheduler, 
+                        use_checkpoint=args.ckpt, eval_interval=args.eval_interval, 
+                        scheduler_update_every_step=True)
+        valid_loader = NeRFDataset(args, device=device, type='val', H=args.gui_h, W=args.gui_h, size=5).dataloader()
+
+        max_epoch = np.ceil(args.iters / len(train_loader)).astype(np.int32)
+        trainer.train(train_loader, valid_loader, max_epoch)
 
     return args, mem_record
     

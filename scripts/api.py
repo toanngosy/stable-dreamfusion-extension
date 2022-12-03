@@ -45,6 +45,7 @@ class DreamfusionParameters(BaseModel):
     # network backbone
     df_fp16: bool = False
     df_backbone: str = "grid"
+    df_sd_version: str = "2.0"
 
     # rendering resolution in training, decrease this if CUDA OOM
     df_w: int = 64
@@ -125,6 +126,7 @@ def dreamFusionAPI(demo: gr.Blocks, app: FastAPI):
             params.df_density_thresh,
             params.df_fp16,
             params.df_backbone,
+            params.df_sd_version,
             params.df_w,
             params.df_h,
             params.df_jitter_pose,
